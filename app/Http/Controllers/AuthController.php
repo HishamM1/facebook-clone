@@ -26,10 +26,6 @@ class AuthController extends Controller
         return redirect()->back()->with('error', 'Invalid credentials');
     }
 
-    public function registerForm()
-    {
-        return inertia('Auth/Register');
-    }
 
     public function register(Request $request)
     {
@@ -41,6 +37,7 @@ class AuthController extends Controller
             'gender' => ['required','string','in:male,female'],
             'password'=> ['required','string'],
         ]);
+        
 
         User::create($user);
         return redirect()->route('login.form');
