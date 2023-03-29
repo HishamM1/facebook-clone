@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed top-0 bottom-0 left-0 right-0 flex justify-center bg-white bg-opacity-80"
+    class="fixed top-0 bottom-0 left-0 right-0 flex justify-center bg-white bg-opacity-80 overflow-y-auto pb-4"
   >
     <div class="shadow-2xl bg-white h-fit w-[30%] mt-[10%] rounded-[8px] relative">
       <img
@@ -16,31 +16,32 @@
       <hr class="h-px bg-gray-200 border-0" />
       <form @submit.prevent="register">
         <div class="p-4">
+          <Errors v-if="errorLength > 0" :errors="registerForm.errors" />
           <div class="mb-3 flex gap-4 items-center w-full">
             <input
               type="text"
               placeholder="First name"
               class="border-[1px] rounded-[8px] p-2 bg-slate-100 w-full"
-              v-model="form.first_name"
+              v-model="registerForm.first_name"
             />
             <input
               type="text"
               placeholder="Last name"
               class="border-[1px] rounded-[8px] p-2 bg-slate-100 w-full"
-              v-model="form.last_name"
+              v-model="registerForm.last_name"
             />
           </div>
           <input
             type="email"
             placeholder="Email address"
             class="border-[1px] rounded-[8px] p-2 block w-full mb-3 bg-slate-100"
-            v-model="form.email"
+            v-model="registerForm.email"
           />
           <input
             type="password"
             placeholder="Password"
             class="border-[1px] rounded-[8px] p-2 block w-full mb-3 bg-slate-100"
-            v-model="form.password"
+            v-model="registerForm.password"
           />
           <div>
             <p class="text-gray-500 text-[15px]">Date of birth</p>
@@ -48,7 +49,7 @@
               type="date"
               class="border-[1px] rounded-[8px] p-2 block w-full mb-3"
               :max="new Date().toISOString().split('T')[0]"
-              v-model="form.birth_date"
+              v-model="registerForm.birth_date"
             />
           </div>
           <div>
@@ -61,7 +62,7 @@
                   name="gender"
                   id="male"
                   value="male"
-                  v-model="form.gender"
+                  v-model="registerForm.gender"
               /></span>
               <span class="border-[1px] px-2 py-2 rounded-[6px] w-full">
                 <label for="female" class="pr-[50%] pl-[12px]">Female</label>
@@ -70,7 +71,7 @@
                   name="gender"
                   value="female"
                   id="female"
-                  v-model="form.gender"
+                  v-model="registerForm.gender"
               /></span>
             </div>
           </div>
@@ -89,7 +90,7 @@
             <button
               type="submit"
               class="bg-green-600 text-white text-xl font-semibold rounded-[6px] w-[50%] py-[4px] text-center"
-              :disabled="form.processing"
+              :disabled="registerForm.processing"
             >
               Sign Up
             </button>
@@ -101,11 +102,15 @@
 </template>
 
 <script setup>
-import { defineEmits } from "vue";
+import { defineEmits, computed } from "vue";
 import { useForm } from "@inertiajs/vue3";
+import Errors from "../Components/Errors.vue";
+
 const emits = defineEmits(["close"]);
 
-const form = useForm({
+const errorLength = computed(() => Object.keys(registerForm.errors).length);
+
+const registerForm = useForm({
   first_name: "",
   last_name: "",
   email: "",
@@ -115,8 +120,9 @@ const form = useForm({
 });
 
 const register = () => {
-  form.post("/register", {
-    onError: () => form.reset("password"),
+  registerForm.post("/register", {
+    onError: () => registerForm.reset("password"),
+    onSuccess: () => emits("close"),
   });
 };
 </script>

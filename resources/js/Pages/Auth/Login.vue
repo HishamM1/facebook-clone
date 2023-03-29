@@ -13,7 +13,7 @@
         <div
           class="bg-white rounded-[8px] w-[350px] lg:w-[420px] min-h-[350px] max-h-[456px] pt-[12px] px-[12px] shadow-xl"
         >
-          <Errors v-if="errorLength > 0" :errors="errors" />
+          <Errors v-if="errorLength > 0" :errors="loginForm.errors" />
 
           <form
             @submit.prevent="login"
@@ -22,7 +22,7 @@
             <div class="w-full">
               <input
                 type="email"
-                v-model="form.email"
+                v-model="loginForm.email"
                 placeholder="Email address"
                 class="px-[16px] py-[14px] rounded-[6px] w-full border-[1px] placeholder:text-lg"
                 autofocus
@@ -31,16 +31,16 @@
             <div class="w-full">
               <input
                 type="password"
-                v-model="form.password"
+                v-model="loginForm.password"
                 placeholder="Password"
                 class="px-[16px] py-[14px] rounded-[6px] w-full border-[1px] placeholder:text-lg"
               />
             </div>
             <button
               type="submit"
-              :disabled="form.processing"
+              :disabled="loginForm.processing"
               class="bg-blue-500 text-white text-2xl font-semibold rounded-[6px] w-full py-[10px] mt-4"
-              :class="{ 'opacity-25': form.processing }"
+              :class="{ 'opacity-25': loginForm.processing }"
             >
               Log in
             </button>
@@ -74,22 +74,19 @@ import { useForm, Link } from "@inertiajs/vue3";
 import Errors from "@/Pages/Components/Errors.vue";
 import RegisterModal from "./RegisterModal.vue";
 
-const props = defineProps(["errors"]);
-
 const showRegister = ref(false);
 
 const toggleRegister = () => (showRegister.value = !showRegister.value);
 
-const errorLength = computed(() => Object.keys(props.errors).length);
+const errorLength = computed(() => Object.keys(loginForm.errors).length);
 
-const form = useForm({
+const loginForm = useForm({
   email: "",
   password: "",
 });
 const login = () => {
-  form.post("/login", {
+  loginForm.post("/login", {
     onError: () => form.reset("password"),
-    onSuccess: () => emit("close"),
   });
 };
 </script>
