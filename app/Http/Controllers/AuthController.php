@@ -19,7 +19,7 @@ class AuthController extends Controller
             'email'=> ['required','email','string','exists:users,email'],
             'password'=> ['required','string']
         ]);
-        if(Auth::attempt($request))
+        if(Auth::attempt($request->only('email','password')))
         {
             return redirect()->route('home');
         }
