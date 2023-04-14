@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('username')->nullable();
             $table->string('email')->unique();
-            $table->string('number')->unique()->nullable()->default(null);
+            $table->string('number')->nullable()->default(null);
             $table->timestamp('birth_date');
             $table->enum('gender', ['male','female']);
             $table->string('bio')->nullable()->default(null);
-            $table->string('profile_picture')->nullable()->default(null);
+            $table->string('profile_picture')->default('default_profile/user-placeholder.png');
             $table->string('cover')->nullable()->default(null);
             $table->string('location')->nullable()->default(null);
             $table->timestamp('email_verified_at')->nullable();

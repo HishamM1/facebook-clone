@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { defineEmits, computed } from "vue";
+import { computed } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import Errors from "../Components/Errors.vue";
 
@@ -120,7 +120,7 @@ const registerForm = useForm({
 });
 
 const register = () => {
-  registerForm.post("/register", {
+  registerForm.post(route("register"), {
     onError: () => registerForm.reset("password"),
     onSuccess: () => emits("close"),
   });

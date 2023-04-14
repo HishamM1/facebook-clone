@@ -1,3 +1,32 @@
+<script setup>
+import { ref } from "vue";
+import { Link, usePage, router } from "@inertiajs/vue3";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import CreatePost from "./Components/CreatePost.vue";
+import PostModal from "./Components/PostModal.vue";
+
+dayjs.extend(relativeTime);
+
+const postForm = ref(false);
+const showMenu = ref(false);
+const postMenu = ref(Array(props.posts.length).fill(false));
+
+const showPostModal = ref(Array(props.posts.length).fill(false));
+
+const togglePost = () => {
+  postForm.value = !postForm.value;
+};
+
+const user = usePage().props.auth.user;
+
+const props = defineProps(["posts", "likes"]);
+
+const isLiked = (id) => {
+  return props.likes.includes(id);
+};
+</script>
+
 <template>
   <nav
     id="MainNav"
@@ -8,6 +37,7 @@
         <img
           class="w-[50px]"
           src="https://img.icons8.com/fluency/48/null/facebook-new.png"
+          alt=""
         />
       </div>
       <label
@@ -63,13 +93,7 @@
     </div>
     <div class="flex items-center justify-end w-2/12 mr-4">
       <button class="rounded-full bg-[#E3E6EA] p-2 hover:bg-gray-300 mx-1 cursor-pointer">
-        <svg
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          width="1em"
-          height="1em"
-          class="x1lliihq x1k90msu x2h7rmj x1qfuztq x198g3q0 x1qx5ct2 xw4jnvo"
-        >
+        <svg fill="currentColor" viewBox="0 0 20 20" width="1em" height="1em">
           <g fill-rule="evenodd" transform="translate(-446 -350)">
             <g fill-rule="nonzero">
               <path
@@ -85,28 +109,14 @@
         </svg>
       </button>
       <button class="rounded-full bg-[#E3E6EA] p-2 hover:bg-gray-300 mx-1 cursor-pointer">
-        <svg
-          viewBox="0 0 28 28"
-          alt=""
-          class="x1lliihq x1k90msu x2h7rmj x1qfuztq x198g3q0"
-          fill="currentColor"
-          height="20"
-          width="20"
-        >
+        <svg viewBox="0 0 28 28" alt="" fill="currentColor" height="20" width="20">
           <path
             d="M14 2.042c6.76 0 12 4.952 12 11.64S20.76 25.322 14 25.322a13.091 13.091 0 0 1-3.474-.461.956 .956 0 0 0-.641.047L7.5 25.959a.961.961 0 0 1-1.348-.849l-.065-2.134a.957.957 0 0 0-.322-.684A11.389 11.389 0 0 1 2 13.682C2 6.994 7.24 2.042 14 2.042ZM6.794 17.086a.57.57 0 0 0 .827.758l3.786-2.874a.722.722 0 0 1 .868 0l2.8 2.1a1.8 1.8 0 0 0 2.6-.481l3.525-5.592a.57.57 0 0 0-.827-.758l-3.786 2.874a.722.722 0 0 1-.868 0l-2.8-2.1a1.8 1.8 0 0 0-2.6.481Z"
           ></path>
         </svg>
       </button>
       <button class="rounded-full bg-[#E3E6EA] p-2 hover:bg-gray-300 mx-1 cursor-pointer">
-        <svg
-          viewBox="0 0 28 28"
-          alt=""
-          class="x1lliihq x1k90msu x2h7rmj x1qfuztq x198g3q0"
-          fill="currentColor"
-          height="20"
-          width="20"
-        >
+        <svg viewBox="0 0 28 28" alt="" fill="currentColor" height="20" width="20">
           <path
             d="M7.847 23.488C9.207 23.488 11.443 23.363 14.467 22.806 13.944 24.228 12.581 25.247 10.98 25.247 9.649 25.247 8.483 24.542 7.825 23.488L7.847 23.488ZM24.923 15.73C25.17 17.002 24.278 18.127 22.27 19.076 21.17 19.595 18.724 20.583 14.684 21.369 11.568 21.974 9.285 22.113 7.848 22.113 7.421 22.113 7.068 22.101 6.79 22.085 4.574 21.958 3.324 21.248 3.077 19.976 2.702 18.049 3.295 17.305 4.278 16.073L4.537 15.748C5.2 14.907 5.459 14.081 5.035 11.902 4.086 7.022 6.284 3.687 11.064 2.753 15.846 1.83 19.134 4.096 20.083 8.977 20.506 11.156 21.056 11.824 21.986 12.355L21.986 12.356 22.348 12.561C23.72 13.335 24.548 13.802 24.923 15.73Z"
           ></path>
@@ -116,7 +126,8 @@
         <button @click="showMenu = !showMenu">
           <img
             class="rounded-full ml-1 min-w-[40px] max-h-[40px] cursor-pointer"
-            src="https://scontent-hbe1-1.xx.fbcdn.net/v/t39.30808-1/242197165_4258717330873341_7535771958652654918_n.jpg?stp=cp0_dst-jpg_p60x60&_nc_cat=102&ccb=1-7&_nc_sid=7206a8&_nc_ohc=9nUu7lFgQsQAX8oGTZ2&_nc_ht=scontent-hbe1-1.xx&oh=00_AfCiJLgrXM2uVyLg_fXtlwEf_FDq_LuekwfM5TrASEj7zw&oe=642CDEBF"
+            :src="user.profile_picture"
+            alt=""
           />
         </button>
         <div
@@ -127,14 +138,14 @@
             <div class="flex items-center gap-3 hover:bg-gray-200 p-2 rounded-lg">
               <img
                 class="rounded-full ml-1 min-w-[35px] max-h-[35px] cursor-pointer"
-                src="https://scontent-hbe1-1.xx.fbcdn.net/v/t39.30808-1/242197165_4258717330873341_7535771958652654918_n.jpg?stp=cp0_dst-jpg_p60x60&_nc_cat=102&ccb=1-7&_nc_sid=7206a8&_nc_ohc=9nUu7lFgQsQAX8oGTZ2&_nc_ht=scontent-hbe1-1.xx&oh=00_AfCiJLgrXM2uVyLg_fXtlwEf_FDq_LuekwfM5TrASEj7zw&oe=642CDEBF"
+                :src="user.profile_picture"
+                alt=""
               />
-              <span>user name</span>
+              <span>{{ user.first_name }} {{ user.last_name }}</span>
             </div>
           </Link>
-          <Link class="w-full" as="button" method="post">
+          <Link class="w-full" as="button" method="post" :href="route('logout')">
             <div class="flex items-center gap-3 hover:bg-gray-200 px-2 py-2.5 rounded-lg">
-              <Logout class="pl-2" :size="30" />
               <span>Logout</span>
             </div>
           </Link>
@@ -146,44 +157,145 @@
     </div>
   </nav>
 
-  <section class="mt-[80px] flex flex-col items-center gap-6">
+  <section
+    class="mt-[80px] flex flex-col items-center gap-6"
+    @click.self="showMenu = false"
+  >
     <div class="border-[px] border-black shadow-md w-[50%] bg-white p-3 rounded-[10px]">
       <div>
         <img
           class="rounded-full ml-1 min-w-[8%px] max-h-[40px] cursor-pointer inline-block"
-          src="https://scontent-hbe1-1.xx.fbcdn.net/v/t39.30808-1/242197165_4258717330873341_7535771958652654918_n.jpg?stp=cp0_dst-jpg_p60x60&_nc_cat=102&ccb=1-7&_nc_sid=7206a8&_nc_ohc=9nUu7lFgQsQAX8oGTZ2&_nc_ht=scontent-hbe1-1.xx&oh=00_AfCiJLgrXM2uVyLg_fXtlwEf_FDq_LuekwfM5TrASEj7zw&oe=642CDEBF"
+          :src="user.profile_picture"
+          alt=""
         />
         <div
-          class="border rounded-[25px] px-2 py-[4px] ml-2 w-[92%] inline-block bg-[#F0F2F5] hover:bg-[#e4e6e9] cursor-pointer"
+          class="border rounded-[25px] px-3 py-[4px] ml-2 w-[92%] inline-block bg-[#F0F2F5] hover:bg-[#e4e6e9] cursor-pointer"
+          @click="togglePost"
         >
-          <span class="text-[#606266] text-lg">What's on your mind?</span>
+          <span class="text-[#606266] text-[16px]">What's on your mind?</span>
         </div>
       </div>
     </div>
 
     <!-- posts -->
-    <div class="border-[px] border-black shadow-md w-[50%] bg-white p-3 rounded-[10px]">
+    <div
+      class="border-[px] border-black shadow-md w-[50%] bg-white p-3 rounded-[10px]"
+      v-for="(post, index) in posts"
+      :key="post.id"
+    >
+      <PostModal
+        :post="post"
+        class="z-50"
+        v-if="showPostModal[index]"
+        :isLiked="isLiked(post.id)"
+        @close-post="showPostModal[index] = false"
+      />
+
       <div>
-        <img
-          class="rounded-full ml-1 min-w-[8%px] max-h-[40px] cursor-pointer inline-block"
-          src="https://scontent-hbe1-1.xx.fbcdn.net/v/t39.30808-1/242197165_4258717330873341_7535771958652654918_n.jpg?stp=cp0_dst-jpg_p60x60&_nc_cat=102&ccb=1-7&_nc_sid=7206a8&_nc_ohc=9nUu7lFgQsQAX8oGTZ2&_nc_ht=scontent-hbe1-1.xx&oh=00_AfCiJLgrXM2uVyLg_fXtlwEf_FDq_LuekwfM5TrASEj7zw&oe=642CDEBF"
-        />
-        <span>Name</span>
-        <div>Time</div>
+        <div class="flex items-center">
+          <button class="mr-2">
+            <img
+              :src="post.user.profile_picture"
+              alt="not found"
+              class="rounded-full ml-1 min-w-[42px] max-h-[42px]"
+            />
+          </button>
+          <div class="flex items-center justify-between rounded-full w-full">
+            <div>
+              <div class="font-semibold text-[15px]">
+                {{ post.user.first_name }} {{ post.user.last_name }}
+              </div>
+              <div class="flex items-center text-xs text-gray-600">
+                {{ dayjs(post.created_at).fromNow() }}
+                <!-- <AccountMultiple :size="15" class="ml-1" fillColor="#64676B" /> -->
+              </div>
+            </div>
+            <div class="flex items-center relative">
+              <button
+                class="rounded-full cursor-pointer hover:bg-[#F2F2F2]"
+                type="submit"
+                @click="postMenu[index] = !postMenu[index]"
+              >
+                <div class="p-2">
+                  <div>
+                    <div
+                      aria-expanded="false"
+                      aria-haspopup="menu"
+                      aria-label="Actions for this post"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        width="1em"
+                        height="1em"
+                      >
+                        <g fill-rule="evenodd" transform="translate(-446 -350)">
+                          <path
+                            d="M458 360a2 2 0 1 1-4 0 2 2 0 0 1 4 0m6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
+                          ></path>
+                        </g>
+                      </svg>
+                      <div data-visualcompletion="ignore" style="inset: -8px"></div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+              <div
+                v-if="postMenu[index]"
+                class="absolute bg-white shadow-xl top-5 right-0 w-[330px] rounded-lg p-1 border mt-1"
+              >
+                <button @click="postMenu[index] = !postMenu[index]" class="w-full">
+                  <div class="flex items-center gap-3 hover:bg-gray-200 p-2 rounded-lg">
+                    <span>Edit</span>
+                  </div>
+                </button>
+                <Link
+                  class="w-full"
+                  as="button"
+                  method="delete"
+                  :href="route('post.destroy', post.id)"
+                  preserve-scroll
+                  @click="postMenu[index] = !postMenu[index]"
+                >
+                  <div
+                    class="flex items-center gap-3 hover:bg-gray-200 px-2 py-2.5 rounded-lg"
+                  >
+                    <span>Delete</span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>Text</div>
-      <div>Image <img src="" class="w-full" /></div>
+      <div v-if="post.content" class="my-2">{{ post.content }}</div>
+
+      <div class="w-full">
+        <img
+          v-if="post.image"
+          :src="`storage/images/` + post.image"
+          alt="no image"
+          class="block my-4 mx-auto w-full max-h-[1000px] max-w-[700px] object-cover"
+        />
+      </div>
       <hr class="h-px bg-gray-200 border-0" />
 
-      <div class="flex items-center justify-around gap-3 pt-2">
-        <div
+      <div class="flex items-center justify-around gap-3 pt-2 font-semibold">
+        <Link
           class="flex items-center gap-1 hover:bg-[#e4e6e9] px-[90px] py-[4px] rounded-[20px] cursor-pointer"
+          method="post"
+          as="button"
+          :href="route('like.store', { post_id: post.id })"
+          preserve-scroll
         >
-          <span>Like</span>
-        </div>
+          <span :class="{ 'text-[#3786e4]': isLiked(post.id) }"> Like</span>
+        </Link>
         <div
           class="flex items-center gap-1 px-[90px] py-[4px] hover:bg-[#e4e6e9] rounded-[20px] cursor-pointer"
+          @click="showPostModal[index] = true"
         >
           <span>Comment</span>
         </div>
@@ -194,11 +306,7 @@
         </div>
       </div>
     </div>
+    <!-- end of posts -->
   </section>
+  <CreatePost v-if="postForm" @cancel-post="togglePost" />
 </template>
-
-<script setup>
-import { ref } from "vue";
-import { Link } from "@inertiajs/vue3";
-const showMenu = ref(false);
-</script>

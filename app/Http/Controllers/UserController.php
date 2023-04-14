@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -11,7 +12,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -35,7 +36,9 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return inertia('user.show', [
+            'user' => User::findOrFail($id),
+        ]);
     }
 
     /**
@@ -43,7 +46,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        
+        return inertia('user.edit');
+        
     }
 
     /**
@@ -51,7 +56,24 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+            'password' => ['nullable', 'string', 'min:8'],
+            'image' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+            'image' => $request->image ? $request->image->store('users', 'public') : $user->image,
+        ]);
+
+        return redirect()->route('user.show', $user->id);
     }
 
     /**

@@ -13,7 +13,14 @@
         <div
           class="bg-white rounded-[8px] w-[350px] lg:w-[420px] min-h-[350px] max-h-[456px] pt-[12px] px-[12px] shadow-xl"
         >
-          <Errors v-if="errorLength > 0" :errors="loginForm.errors" />
+          <ul
+            v-if="usePage().props.error"
+            class="list-disc ml-5 mb-2 text-red-600 font-semibold"
+          >
+            <li>
+              {{ usePage().props.error }}
+            </li>
+          </ul>
 
           <form
             @submit.prevent="login"
@@ -70,7 +77,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { useForm, Link } from "@inertiajs/vue3";
+import { useForm, Link, usePage } from "@inertiajs/vue3";
 import Errors from "@/Pages/Components/Errors.vue";
 import RegisterModal from "./RegisterModal.vue";
 
@@ -85,7 +92,7 @@ const loginForm = useForm({
   password: "",
 });
 const login = () => {
-  loginForm.post("/login", {
+  loginForm.post(route("login"), {
     onError: () => form.reset("password"),
   });
 };
